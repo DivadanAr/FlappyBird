@@ -7,15 +7,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
+    /* Reset */
+    *{
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
     canvas {
       border: 1px solid #d3d3d3;
       background-color: #f1f1f1;
+      margin: 0;
+      padding: 0;
     }
   </style>
 </head>
 
 <body onload="startGame()">
   <script>
+
+     // Create Function VH() & VW()
+     function vh(percent) {
+          var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+          return (percent * h) / 100;
+      }
+
+      function vw(percent) {
+          var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+          return (percent * w) / 100;
+      }
+
     var myGamePiece;
     var myBackground;
     var myObstacles = [];
@@ -24,8 +45,8 @@
     let score = 0 ;
 
     function startGame() {
-      myGamePiece = new component(30, 30, "birdfly.png", 100, 120, "image");
-      myBackground = new component(500, 300, "background.jpg", 0, 0, "background");
+      myGamePiece = new component(35, 35, "birdfly.png", 100, 120, "image");
+      myBackground = new component(vw(100), vh(100), "background.jpg", 0, 0, "background");
       myScore = new component("20px", "sans-serif", "black", 0, 20, "text");
       myGameArea.start();
     }
@@ -33,8 +54,8 @@
     var myGameArea = {
       canvas: document.createElement("canvas"),
       start: function () {
-        this.canvas.width = 500;
-        this.canvas.height = 300;
+        this.canvas.width = vw(100);
+        this.canvas.height = vh(100);
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.frameNo = 0;
