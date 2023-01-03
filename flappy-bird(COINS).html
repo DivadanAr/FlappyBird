@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flappy-bird</title>
+  <title>Document</title>
   <style>
     canvas {
       border: 1px solid #d3d3d3;
@@ -19,9 +19,10 @@
     var myGamePiece;
     var myBackground;
     var myObstacles = [];
+    var myCoins = [];
 
     function startGame() {
-      myGamePiece = new component(30, 30, "birdfly.png", 50, 120, "image");
+      myGamePiece = new component(30, 30, "birdfly.png", 100, 120, "image");
       myBackground = new component(500, 300, "background.jpg", 0, 0, "background");
       myGameArea.start();
     }
@@ -60,11 +61,6 @@
       this.y = y;
       this.update = function () {
         ctx = myGameArea.context;
-        if (this.type == "text") {
-          ctx.font = this.width + " " + this.height;
-          ctx.fillStyle = color;
-          ctx.fillText(this.text, this.x, this.y);
-        }
         if (type == "image" || type == "background") {
           ctx.drawImage(this.image,
             this.x,
@@ -117,6 +113,21 @@
         }
         return crash;
       }
+      this.point = function (otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var point = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+          point = false;
+        }
+        return point;
+      }
     }
 
     function updateGameArea() {
@@ -125,6 +136,13 @@
         if (myGamePiece.crashWith(myObstacles[i])) {
           myGameArea.stop();
           return;
+        }
+      }
+      for (i = 0; i < myCoins.length; i += 1) {
+        if (myGamePiece.point(myCoins[i])) {
+          // <!--opsi lain--->
+          // myCoins.splice(myCoins[i], 1);
+          myCoins.shift();
         }
       }
       myGameArea.clear();
@@ -140,12 +158,21 @@
         minGap = 70;
         maxGap = 150;
         gap = Math.floor(Math.random() * (maxGap - minGap + 1) + minGap);
-        myObstacles.push(new component(30, height, "obstacle-top.png", x, 0, "image"));
-        myObstacles.push(new component(30, x - height - gap, "obstacle-bottom.png", x, height + gap, "image"));
+        myObstacles.push(new component(30, height, "obstacletop.png", x, 0, "image"));
+        myObstacles.push(new component(30, x - height - gap, "obstaclebottom.png", x, height + gap, "image"));
+        myCoins.push(new component(20, 20, "coin.png", x, height + gap - 50, "image"));
       }
+      
+      
       for (i = 0; i < myObstacles.length; i += 1) {
         myObstacles[i].x += -3;
         myObstacles[i].update();
+      }
+
+      for (i = 0; i < myCoins.length; i += 1) {
+        myCoins[i].x += -3;
+        myCoins[i].update();
+
       }
       myGamePiece.newPos();
       myGamePiece.update();
@@ -159,13 +186,16 @@
     }
 
     function accelerate(n) {
+      // if (!myGameArea.interval) {
+      //   myGameArea.interval = setInterval(updateGameArea);
+      // }
       myGamePiece.gravity = n;
     }
 
     document.body.addEventListener("keydown", (event) => {
       if (event.code === "Space" || event.key === "ArrowUp") {
         myGamePiece.speedY = -2;
-        accelerate(-0.1)
+        accelerate(-0.1);
         myGamePiece.image.src = "birdfall.png";
       }
     });
@@ -173,7 +203,7 @@
     document.body.addEventListener("keyup", (event) => {
       if (event.code === "Space" || event.key === "ArrowUp") {
         myGamePiece.speedY = +2;
-        accelerate(0.05)
+        accelerate(0.05);
         myGamePiece.image.src = "birdfly.png";
       }
     });
