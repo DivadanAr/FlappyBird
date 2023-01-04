@@ -7,11 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Indie+Flower&family=Lobster&family=Lobster+Two:wght@400;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Quicksand:wght@300;400;500;600;700&family=Rubik+Bubbles&display=swap" rel="stylesheet">
+
   <style>
     canvas {
       border: 1px solid #d3d3d3;
       background-color: #f1f1f1;
     }
+
+    *{
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+
   </style>
 </head>
 
@@ -20,23 +28,24 @@
     var myGamePiece;
     var myBackground;
     var myObstacles = [];
-    var lineScore = [];
+    var objScore = [];
     var myCoins = [];
     var myScore;
     let score = 0 ;
 
     function startGame() {
-      myGamePiece = new component(30, 30, "birdfly.png", 100, 120, "image");
-      myBackground = new component(500, 300, "background.jpg", 0, 0, "background");
-      myScore = new component("20px", "Rubik Bubbles", "black", 0, 20, "text");
+      myGamePiece = new component(70, 70, "birdfly.png", 200, 300, "image");
+      myBackground = new component(window.innerWidth, window.innerHeight, "background.jpg", 0, 0, "background");
+      myScore = new component("22px", "Rubik Bubbles", "black", 10, 25, "text");
       myGameArea.start();
     }
 
+    // CANVAS
     var myGameArea = {
       canvas: document.createElement("canvas"),
       start: function () {
-        this.canvas.width = 500;
-        this.canvas.height = 300;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.frameNo = 0;
@@ -50,6 +59,7 @@
       }
     }
 
+    // COMPONENTS
     function component(width, height, color, x, y, type) {
       this.type = type;
       if (type == "image" || type == "background") {
@@ -71,7 +81,7 @@
             ctx.fillStyle = color;
             ctx.fillText(this.text, this.x, this.y);
         }
-        if (type == "image" || type == "background") {
+        else if (type == "image" || type == "background") {
           ctx.drawImage(this.image,
             this.x,
             this.y,
@@ -102,7 +112,7 @@
         var rockbottom = myGameArea.canvas.height - this.height;
         if (this.y > rockbottom) {
           this.y = rockbottom;
-        } else if (myGamePiece.y >= myGameArea.canvas.height - 32) {
+        } else if (myGamePiece.y >= window.innerHeight - 72) {
           myGameArea.stop()
         } else if (myGamePiece.y <= 0) {
           myGameArea.stop()
@@ -164,57 +174,47 @@
           return;
         }
       }
-      for (i = 0; i < lineScore.length; i += 1) {
-        if (myGamePiece.point(lineScore[i])) {
-          // <!--opsi lain--->
-          // lineScore.splice(lineScore[i], 1);
-          // lineScore.shift();
+      for (i = 0; i < objScore.length; i += 1) {
+        if (myGamePiece.point(objScore[i])) {
           score = score + 1;
         }
       }
       for (i = 0; i < myCoins.length; i += 1) {
         if (myGamePiece.coin(myCoins[i])) {
-          // <!--opsi lain--->
-          // myCoins.splice(myCoins[i], 1);
           myCoins.shift();
         }
       }
       myGameArea.clear();
-      myBackground.speedX = -2;
+      myBackground.speedX = -4;
       myBackground.newPos();
       myBackground.update();
       myGameArea.frameNo += 1;
-      if (myGameArea.frameNo == 1 || everyinterval(70)) {
+      if (myGameArea.frameNo == 1 || everyinterval(80)) {
         x = myGameArea.canvas.width;
-        minHeight = 50;
-        maxHeight = 150;
+        minHeight = 100;
+        maxHeight = 500;
         height = Math.floor(Math.random() * (maxHeight - minHeight + 1) + minHeight);
-        minGap = 70;
-        maxGap = 150;
+        minGap = 150;
+        maxGap = 400;
         gap = Math.floor(Math.random() * (maxGap - minGap + 1) + minGap);
-        myObstacles.push(new component(30, height, "obstacletop.png", x, 0, "image"));
-        myObstacles.push(new component(30, x - height - gap, "obstaclebottom.png", x, height + gap, "image"));
-        myCoins.push(new component(20, 20, "coin.png", x, height + gap - 50, "image"));
-        lineScore.push(new component(5, 5, "transparent", x, height + gap - 50));
+        myObstacles.push(new component(90, height, "obstacletop.png", x, 0, "image"));
+        myObstacles.push(new component(90, x - height - gap, "obstaclebottom.png", x, height + gap, "image"));
+        myCoins.push(new component(50, 50, "coin.png", x + 20, height + gap - 150, "image"));
+        objScore.push(new component(15, 15, "transparent", x + 95, height + gap - 125));
       }
-
-
       for (i = 0; i < myObstacles.length; i += 1) {
-        myObstacles[i].x += -3;
+        myObstacles[i].x += -8;
         myObstacles[i].update();
       }
-
-      for (i = 0; i < lineScore.length; i += 1) {
-        lineScore[i].x += -3;
-        lineScore[i].update();
-
+      for (i = 0; i < objScore.length; i += 1) {
+        objScore[i].x += -8;
+        objScore[i].update();
       }
       for (i = 0; i < myCoins.length; i += 1) {
-        myCoins[i].x += -3;
+        myCoins[i].x += -8;
         myCoins[i].update();
-
       }
-      myScore.text = "SCORE: " + (Math.round(score / 10));
+      myScore.text = "Score : " + (Math.round(score / 10));
       myScore.update();
       myGamePiece.newPos();
       myGamePiece.update();
@@ -227,17 +227,15 @@
       return false;
     }
 
+    // CONTROLLER
     function accelerate(n) {
-      // if (!myGameArea.interval) {
-      //   myGameArea.interval = setInterval(updateGameArea);
-      // }
       myGamePiece.gravity = n;
     }
 
     document.body.addEventListener("keydown", (event) => {
       if (event.code === "Space" || event.key === "ArrowUp") {
         myGamePiece.speedY = -2;
-        accelerate(-0.1);
+        accelerate(-0.3);
         myGamePiece.image.src = "birdfall.png";
       }
     });
@@ -245,11 +243,10 @@
     document.body.addEventListener("keyup", (event) => {
       if (event.code === "Space" || event.key === "ArrowUp") {
         myGamePiece.speedY = +2;
-        accelerate(0.05);
+        accelerate(0.15);
         myGamePiece.image.src = "birdfly.png";
       }
     });
   </script>
 </body>
-
 </html>
